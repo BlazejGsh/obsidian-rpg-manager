@@ -1,0 +1,45 @@
+name: Manual Build and Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      npm_command:
+        description: 'NPM command to run'
+        required: true
+        default: 'build'
+        type: choice
+        options:
+          - build
+          - test
+          - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run NPM command
+        run: npm run ${{ github.event.inputs.npm_command }}
+
+      - name: Upload build artifacts
+        if: success() && github.event.inputs.npm_command == 'build'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            main.js
+            styles.css
+            manifest.json
+          retention-days: 7

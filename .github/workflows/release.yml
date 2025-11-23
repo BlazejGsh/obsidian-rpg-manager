@@ -1,0 +1,91 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 4.1.15)'
+        required: true
+        type: string
+      tag:
+        description: 'Git tag (e.g., 4.1.15)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Update version in manifest.json
+        run: |
+          node -e "
+            const manifest = require('./manifest.json');
+            manifest.version = '${{ github.event.inputs.version }}';
+            require('fs').writeFileSync('./manifest.json', JSON.stringify(manifest, null, '\t'));
+          "
+
+      - name: Update version in manifest-beta.json
+        run: |
+          node -e "
+            const manifest = require('./manifest-beta.json');
+            manifest.version = '${{ github.event.inputs.version }}';
+            require('fs').writeFileSync('./manifest-beta.json', JSON.stringify(manifest, null, '\t'));
+          "
+
+      - name: Update versions.json
+        run: |
+          node -e "
+            const fs = require('fs');
+            const versions = JSON.parse(fs.readFileSync('./versions.json', 'utf-8'));
+            versions['${{ github.event.inputs.version }}'] = '1.4.0';
+            fs.writeFileSync('./versions.json', JSON.stringify(versions, null, 2));
+          "
+
+      - name: Build plugin
+        run: npm run build
+
+      - name: Create tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add manifest.json manifest-beta.json versions.json
+          git commit -m "Bump version to ${{ github.event.inputs.version }}" || true
+          git tag -a ${{ github.event.inputs.tag }} -m "Release ${{ github.event.inputs.version }}" || true
+          git push origin ${{ github.event.inputs.tag }} --force
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: Release ${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            main.js
+            manifest.json
+            manifest-beta.json
+            styles.css
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push version updates
+        run: |
+          git push origin master || git push origin main
