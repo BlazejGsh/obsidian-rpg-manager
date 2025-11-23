@@ -30,6 +30,7 @@ export enum AttributeType {
 	NonPlayerCharacterType = "nonplayercharactertype",
 	SensoryImprint = "sensoryimprint",
 	Occupation = "occupation",
+	Gender = "gender",
 	Stake = "stake",
 	Kishotenketsu = "kishotenketsu",
 	Conflict = "conflict",

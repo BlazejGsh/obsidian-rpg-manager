@@ -287,17 +287,44 @@ export default function NonPlayerCharacterWizardComponent({
 
 	const CurrentStepComponent = stepsType[step - 1];
 
-	const save = () => {
-		const attributes = Object.entries(wizardData).map(([name, value]) => ({
-			name: name,
-			value: value,
-		}));
+	const save = async () => {
+		const attributes = Object.entries(wizardData).map(([key, value]) => {
+			// Map wizard data keys to their AttributeType equivalents
+			let attributeId = key;
+			const keyLower = key.toLowerCase();
+			
+			// Map known fields to their proper AttributeType IDs
+			const attributeMap: { [key: string]: string } = {
+				nonplayercharactertype: AttributeType.NonPlayerCharacterType,
+				description: AttributeType.Description,
+				occupation: AttributeType.Occupation,
+				arc: AttributeType.Arc,
+				beliefs: AttributeType.Beliefs,
+				ghost: AttributeType.Ghost,
+				lie: AttributeType.Lie,
+				need: AttributeType.Need,
+				strengths: AttributeType.Strengths,
+				weaknesses: AttributeType.Weaknesses,
+				behaviour: AttributeType.Behaviour,
+				want: AttributeType.Want,
+				opposition: AttributeType.Opposition,
+				gender: AttributeType.Gender,
+				stake: AttributeType.Stake,
+			};
+			
+			attributeId = attributeMap[keyLower] || key;
+			
+			return {
+				name: attributeId,
+				value: value,
+			};
+		});
 
 		if (returnData !== undefined) {
 			returnData(attributes);
 		} else {
 			const codeblockService = new RpgManagerCodeblockService(app, api, element.file);
-			codeblockService.updateCodeblockDataList(attributes);
+			await codeblockService.updateCodeblockDataList(attributes);
 			close();
 		}
 	};

@@ -19,6 +19,7 @@ const type = { id: AttributeType.SceneType, type: AttributeComponentType.SceneTy
 const dob = { id: AttributeType.Dob, type: AttributeComponentType.Date };
 const dod = { id: AttributeType.Dod, type: AttributeComponentType.Date };
 const occupation = { id: AttributeType.Occupation, type: AttributeComponentType.Text };
+const gender = { id: AttributeType.Gender, type: AttributeComponentType.Text };
 const sceneaction = { id: AttributeType.SceneAction, type: AttributeComponentType.LongText };
 const date = { id: AttributeType.Date, type: AttributeComponentType.Date };
 const sessiondate = { id: AttributeType.SessionDate, type: AttributeComponentType.Date };
@@ -57,6 +58,7 @@ export const attributes: Map<ElementType, AttributeInterface[]> = new Map<Elemen
 			sensoryimprint,
 			nonplayercharactertype,
 			occupation,
+			gender,
 			ghost,
 			lie,
 			arc,
