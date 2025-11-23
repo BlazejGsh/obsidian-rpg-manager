@@ -148,6 +148,7 @@ Jeśli chcesz utworzyć nowe, po prostu kliknij przycisk i zdefiniuj nazwę i ty
 		kishotenketsu: "Kishōtenketsu",
 		conflict: "Konflikt",
 		pronoun: "Zaimek",
+		gender: "Płeć",
 	},
 	npctype: {
 		npctype_main: "Główna",

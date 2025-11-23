@@ -6,6 +6,7 @@ import { RpgManagerInterface } from "src/RpgManagerInterface";
 export interface RpgManagerSettingsInterface {
 	chatGptKey: string | undefined;
 	chatGptModel: string;
+	debugMode: boolean;
 	templatesFolder: string | undefined;
 	assetsFolder: string | undefined;
 	automaticMove: boolean;
@@ -20,6 +21,7 @@ export type PartialSettings = Partial<RpgManagerSettingsInterface>;
 export const rpgManagerDefaultSettings: RpgManagerSettingsInterface = {
 	chatGptKey: undefined,
 	chatGptModel: "gpt-4-turbo",
+	debugMode: false,
 	templatesFolder: undefined,
 	assetsFolder: undefined,
 	automaticMove: false,
@@ -163,6 +165,15 @@ export class RpgManagerSettings extends PluginSettingTab {
 				dropdown.setValue(this._plugin.settings.chatGptModel)
 				dropdown.onChange(async (value: string) => {
 					await this.saveSettings({ chatGptModel: value });
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("Debug Mode")
+			.setDesc("Enable debug logging to console to troubleshoot OpenRouter API responses and requests.")
+			.addToggle((toggle) => {
+				toggle.setValue(this._plugin.settings.debugMode).onChange(async (value) => {
+					await this.saveSettings({ debugMode: value });
 				});
 			});
 	}

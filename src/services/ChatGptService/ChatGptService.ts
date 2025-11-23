@@ -108,12 +108,23 @@ Each option should be qualitative, not a short sentence and will allow the story
 		// new ChatGptMessage("system", 'Format your response as: {"responses":[{"response":"YOUR RESPONSE"}]}')
 		// );
 		try {
+			const payload = {
+				model: this._mapModelToOpenRouter(this._model),
+				messages: messages,
+			};
+
+			if (this._api.settings.debugMode) {
+				console.log("[RPG Manager Debug] OpenRouter Request:", {
+					endpoint: this._endpoint,
+					model: payload.model,
+					messagesCount: messages.length,
+					timestamp: new Date().toISOString(),
+				});
+			}
+
 			const response = await axios.post(
 				this._endpoint,
-				{
-					model: this._mapModelToOpenRouter(this._model),
-					messages: messages,
-				},
+				payload,
 				{
 					headers: {
 						Authorization: `Bearer ${this._api.settings.chatGptKey}`,
@@ -124,9 +135,26 @@ Each option should be qualitative, not a short sentence and will allow the story
 				}
 			);
 
+			if (this._api.settings.debugMode) {
+				console.log("[RPG Manager Debug] OpenRouter Response:", {
+					status: response.status,
+					choicesCount: response.data.choices?.length,
+					usage: response.data.usage,
+					timestamp: new Date().toISOString(),
+				});
+			}
+
 			const latestMessage = response.data.choices?.[0]?.message?.content;
 			return this._processLatestMessage(latestMessage);
 		} catch (error) {
+			if (this._api.settings.debugMode) {
+				console.error("[RPG Manager Debug] OpenRouter Error:", {
+					message: error instanceof Error ? error.message : String(error),
+					response: (error as any).response ? (error as any).response.data : undefined,
+					status: (error as any).response ? (error as any).response.status : undefined,
+					timestamp: new Date().toISOString(),
+				});
+			}
 			console.warn(error);
 			throw error;
 		}

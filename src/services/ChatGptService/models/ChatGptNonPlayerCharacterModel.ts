@@ -40,6 +40,9 @@ export class ChatGptNonPlayerCharacterModel {
 		const descriptionMessage: ChatGptMessageInterface | undefined = this._dataMessages.get("description");
 		if (descriptionMessage) response.push(descriptionMessage);
 
+		const genderMessage: ChatGptMessageInterface | undefined = this._dataMessages.get("gender");
+		if (genderMessage) response.push(genderMessage);
+
 		const characterArcMessage: ChatGptMessageInterface | undefined = this._dataMessages.get("characterArc");
 		if (characterArcMessage) response.push(characterArcMessage);
 
@@ -138,6 +141,31 @@ export class ChatGptNonPlayerCharacterModel {
 			return `Il personaggio non giocante che stai creando è ${this._name}. `;
 		}
 		return `The non-player character you are creating is ${this._name}. `;
+	}
+
+	set gender(gender: string) {
+		this._dataMessages.set("gender", {
+			role: "system",
+			content: `The "gender" of ${this._name} is: \`\`\`${gender}\`\`\`.`,
+		});
+	}
+
+	async getGender(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 możliwych płci dla ${this._name} spójnych z dotychczasowo opisaną postacią.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 possibili generi per ${this._name} coerenti con il personaggio descritto finora.`;
+		} else {
+			content = `Based on the information provided, suggest 10 possible genders for ${this._name} that are consistent with the character described so far.`;
+		}
+		const message: ChatGptMessageInterface = {
+			role: "user",
+			content: content,
+		};
+
+		return this._generateSuggestions(message, "short");
 	}
 
 	set description(description: string) {

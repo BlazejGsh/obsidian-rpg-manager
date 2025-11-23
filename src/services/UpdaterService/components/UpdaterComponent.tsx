@@ -33,6 +33,7 @@ function Upgrading(): React.ReactElement {
 			const settings: RpgManagerSettingsInterface = {
 				chatGptKey: undefined,
 				chatGptModel: "gpt-4-turbo",
+				debugMode: false,
 				templatesFolder: (api.settings as any).templateFolder,
 				assetsFolder: (api.settings as any).imagesFolder,
 				automaticMove: false,
