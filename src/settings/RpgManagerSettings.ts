@@ -134,14 +134,14 @@ export class RpgManagerSettings extends PluginSettingTab {
 		const ChatGPTWarning = containerEl.createEl("p");
 		ChatGPTWarning.appendChild(
 			createEl("span", {
-				text: "Please note: ChatGPT is a paid service, you need to have a key to use it. Also, some data from your vault will be sent to OpenAI.",
+				text: "Please note: ChatGPT is accessed via OpenRouter, a paid service. You need to have an OpenRouter API key to use it. Visit https://openrouter.ai to get your key. Some data from your vault will be sent to OpenRouter.",
 				cls: "text-[--text-warning]",
 			})
 		);
 
 		new Setting(containerEl)
-			.setName("OpenAI Key")
-			.setDesc("Insert your OpenAI key here.")
+			.setName("OpenRouter API Key")
+			.setDesc("Insert your OpenRouter API key here. Get one at https://openrouter.ai")
 			.addText((text) =>
 				text
 					.setPlaceholder("")

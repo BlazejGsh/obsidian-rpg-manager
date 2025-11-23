@@ -7,7 +7,7 @@ import { ChatGptMessageInterface } from "./interfaces/ChatGptMessageInterface";
 import { ChatGptResponse } from "./interfaces/ChatGptResponse";
 
 export class ChatGptService {
-	private _endpoint = "https://api.openai.com/v1/chat/completions";
+	private _endpoint = "https://openrouter.ai/api/v1/chat/completions";
 
 	constructor(private _api: RpgManagerInterface, private _model: ChatGptModel = ChatGptModel.Gpt3Turbo) {}
 
@@ -54,12 +54,14 @@ Each option should be qualitative, not a short sentence and will allow the story
 			const response = await axios.post(
 				this._endpoint,
 				{
-					model: this._model,
+					model: this._mapModelToOpenRouter(this._model),
 					messages: messages,
 				},
 				{
 					headers: {
 						Authorization: `Bearer ${this._api.settings.chatGptKey}`,
+						"HTTP-Referer": "https://github.com/carlonicora/obsidian-rpg-manager",
+						"X-Title": "RPG Manager",
 						"Content-Type": "application/json",
 					},
 				}
@@ -70,6 +72,17 @@ Each option should be qualitative, not a short sentence and will allow the story
 		} catch (error) {
 			console.warn(error);
 			throw error;
+		}
+	}
+
+	private _mapModelToOpenRouter(model: ChatGptModel): string {
+		switch (model) {
+			case ChatGptModel.Gpt3Turbo:
+				return "openai/gpt-3.5-turbo";
+			case ChatGptModel.Gpt4:
+				return "openai/gpt-4-turbo";
+			default:
+				return "openai/gpt-3.5-turbo";
 		}
 	}
 
