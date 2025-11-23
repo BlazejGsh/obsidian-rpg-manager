@@ -28,7 +28,18 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	private _generateMessages(length: "short" | "long"): ChatGptMessageInterface[] {
+		const language = this._getLanguage();
 		const response: ChatGptMessageInterface[] = [];
+		
+		// Add language instruction first
+		let languageInstruction = "Respond in English.";
+		if (language === "pl") {
+			languageInstruction = "Odpowiadaj wyłącznie w polskim.";
+		} else if (language === "it") {
+			languageInstruction = "Rispondi solo in italiano.";
+		}
+		response.push(new ChatGptMessage("system", languageInstruction));
+		
 		response.push(new ChatGptMessage("system", this._service.persona()));
 		response.push(new ChatGptMessage("system", this.persona()));
 		response.push(new ChatGptMessage("system", this._service.format()));
@@ -144,9 +155,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set gender(gender: string) {
+		const language = this._getLanguage();
+		let label = "gender";
+		if (language === "pl") label = "płeć";
+		else if (language === "it") label = "genere";
+		
 		this._dataMessages.set("gender", {
 			role: "system",
-			content: `The "gender" of ${this._name} is: \`\`\`${gender}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${gender}\`\`\`.`,
 		});
 	}
 
@@ -169,23 +185,38 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set description(description: string) {
+		const language = this._getLanguage();
+		let label = "description";
+		if (language === "pl") label = "opis";
+		else if (language === "it") label = "descrizione";
+		
 		this._dataMessages.set("description", {
 			role: "system",
-			content: `The "description" of ${this._name} is: \`\`\`${description}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${description}\`\`\`.`,
 		});
 	}
 
 	set occupation(occupation: string) {
+		const language = this._getLanguage();
+		let label = "occupation";
+		if (language === "pl") label = "zawód";
+		else if (language === "it") label = "occupazione";
+		
 		this._dataMessages.set("occupation", {
 			role: "system",
-			content: `The "occupation" of ${this._name} is: \`\`\`${occupation}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${occupation}\`\`\`.`,
 		});
 	}
 
 	set characterArc(characterArc: ArcType) {
+		const language = this._getLanguage();
+		let label = "character arc";
+		if (language === "pl") label = "łuk postaci";
+		else if (language === "it") label = "arco del carattere";
+		
 		this._dataMessages.set("characterArc", {
 			role: "system",
-			content: `The "character arc" of ${this._name} is ${ArcType[characterArc]}.`,
+			content: `The "${label}" of ${this._name} is ${ArcType[characterArc]}.`,
 		});
 	}
 
@@ -208,9 +239,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set beliefs(beliefs: string) {
+		const language = this._getLanguage();
+		let label = "beliefs";
+		if (language === "pl") label = "przekonania";
+		else if (language === "it") label = "convinzioni";
+		
 		this._dataMessages.set("beliefs", {
 			role: "system",
-			content: `The "beliefs" of ${this._name} is: \`\`\`${beliefs}\`\`\`.`,
+			content: `The "${label}" of ${this._name} are: \`\`\`${beliefs}\`\`\`.`,
 		});
 	}
 
@@ -236,9 +272,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set ghost(ghost: string) {
+		const language = this._getLanguage();
+		let label = "ghost";
+		if (language === "pl") label = "duchowe wspomnienie";
+		else if (language === "it") label = "fantasma";
+		
 		this._dataMessages.set("ghost", {
 			role: "system",
-			content: `The "ghost" of ${this._name} is: \`\`\`${ghost}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${ghost}\`\`\`.`,
 		});
 	}
 
@@ -261,9 +302,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set lie(lie: string) {
+		const language = this._getLanguage();
+		let label = "lie";
+		if (language === "pl") label = "kłamstwo";
+		else if (language === "it") label = "bugia";
+		
 		this._dataMessages.set("lie", {
 			role: "system",
-			content: `The "lie" of ${this._name} is: \`\`\`${lie}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${lie}\`\`\`.`,
 		});
 	}
 
@@ -286,9 +332,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set need(need: string) {
+		const language = this._getLanguage();
+		let label = "need";
+		if (language === "pl") label = "potrzeba";
+		else if (language === "it") label = "bisogno";
+		
 		this._dataMessages.set("need", {
 			role: "system",
-			content: `The "need" of ${this._name} is: \`\`\`${need}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${need}\`\`\`.`,
 		});
 	}
 
@@ -311,9 +362,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set strengths(strengths: string) {
+		const language = this._getLanguage();
+		let label = "strengths";
+		if (language === "pl") label = "mocne strony";
+		else if (language === "it") label = "punti di forza";
+		
 		this._dataMessages.set("strenghts", {
 			role: "system",
-			content: `The "strenghts" of ${this._name} are: \`\`\`${strengths}\`\`\`.`,
+			content: `The "${label}" of ${this._name} are: \`\`\`${strengths}\`\`\`.`,
 		});
 	}
 
@@ -336,60 +392,61 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set weaknesses(weaknesses: string) {
+		const language = this._getLanguage();
+		let label = "weaknesses";
+		if (language === "pl") label = "słabe strony";
+		else if (language === "it") label = "debolezze";
+		
 		this._dataMessages.set("weaknesses", {
 			role: "system",
-			content: `The "weaknesses" of ${this._name} are: \`\`\`${weaknesses}\`\`\`.`,
+			content: `The "${label}" of ${this._name} are: \`\`\`${weaknesses}\`\`\`.`,
 		});
 	}
 
 	async getBehaviour(): Promise<string[]> {
-		const message: ChatGptMessageInterface = {
-			role: "user",
-			content: `Generate 10 distinct sets of mixed behaviors, mannerisms, and speech patterns for ${this._name}
+		const language = this._getLanguage();
+		let content = "";
+		
+		if (language === "pl") {
+			content = `Wygeneruj 10 odrębnych zestawów mieszanych zachowań, manier i wzorów mowy dla ${this._name}
+			używając wszystkich podanych informacji. Każdy zestaw powinien obejmować różne aspekty cech postaci
+			w kolekcję różnorodnych działań i reakcji odpowiednią do natychmiastowego grania roli.
+			Pamiętaj, każdy zestaw powinien być mieszanką cech, a nie skupiać się na pojedynczym aspekcie i wybiorę
+			tylko jedną z twoich odpowiedzi, więc każdy powinien być kompletnym zestawem zachowań. Daj mi jeden zestaw zachowań
+			na linię, bez wprowadzenia, list czy numeracji. Tylko zachowania.`;
+		} else if (language === "it") {
+			content = `Genera 10 insiemi distinti di comportamenti misti, modi di fare e modelli di linguaggio per ${this._name}
+			utilizzando tutte le informazioni fornite finora. Ogni insieme dovrebbe comprendere vari aspetti dei tratti del personaggio
+			in una raccolta di azioni e reazioni diverse adatte al gioco di ruolo immediato.
+			Ricorda, ogni insieme dovrebbe essere una miscela di tratti piuttosto che concentrarsi su un singolo aspetto e sceglierò solo
+			una delle tue risposte, quindi ciascuno dovrebbe essere un insieme completo di comportamenti. Dammi un insieme di comportamenti
+			per riga, senza introduzione, elenchi o numerazione. Solo i comportamenti.`;
+		} else {
+			content = `Generate 10 distinct sets of mixed behaviors, mannerisms, and speech patterns for ${this._name}
 			using all the information provided so far. Each set should encompass various facets of the character's traits 
 			into a collection of diverse actions and reactions suitable for immediate role-play. 
 			Remember, each set should be a blend of their traits rather than focusing on just one aspect and I will only
 			pick one of your answers, so each of them should be a complete set of behaviors. Give me one set of behaviours
-			per line, no introduction, lists or numbering. Just the behaviors.`,
-
-			// content: `Given the background and characteristics of ${this._name}, generate ten groups of interrelated
-			// behaviors for ${this._name} that reflect a blend of their motivations, traits, and experiences.
-			// These behaviors should be clear, actionable patterns that can be immediately used for roleplaying,
-			// without focusing on any single element of his character in isolation.`,
-
-			// content: `Using the full scope of details and traits provided about ${this._name}, generate
-			// ten behavioral descriptions that weave together the various facets of their personality,
-			// background, and motivations. Ensure that each description seamlessly integrates multiple
-			// elements of his character, offering a broad perspective on how he behaves in diverse situations.`,
-
-			// content: `"Using all the details and characteristics provided about ${this._name},
-			// craft ten groups of behaviors that encompass their entire persona.
-			// Each group should not isolate a single trait but instead intertwine multiple aspects
-			// of their background, traits, and motivations.
-			// The description for each group should offer a rich and interconnected
-			// portrayal of how ${this._name} operates in a multitude of scenarios,
-			// reflecting the full complexity of their character."`,
-
-			// content: `Given the background and characteristics of ${this._name},
-			// enumerate ten comprehensive categories of behaviors that represent different
-			// facets of their personality. For each category, provide a detailed description
-			// that captures the depth, nuances, and specific instances or mannerisms associated
-			// with that behavior, offering a vivid portrayal of how ${this._name} might act and react in various contexts.`,
-
-			// content: `Given the background and characteristics of ${this._name},
-			// list ten comprehensive categories or groups of behaviors that encapsulate
-			// different facets of their personality.
-			// Each category should give an overarching theme of how ${this._name} might
-			// act and react in various situations, providing a holistic view of their character.`,
+			per line, no introduction, lists or numbering. Just the behaviors.`;
+		}
+		
+		const message: ChatGptMessageInterface = {
+			role: "user",
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "long");
 	}
 
 	set behaviour(behaviour: string) {
+		const language = this._getLanguage();
+		let label = "behaviour";
+		if (language === "pl") label = "zachowanie";
+		else if (language === "it") label = "comportamento";
+		
 		this._dataMessages.set("behaviour", {
 			role: "system",
-			content: `The "behaviour" of ${this._name} is: \`\`\`${behaviour}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${behaviour}\`\`\`.`,
 		});
 	}
 
@@ -412,9 +469,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set want(want: string) {
+		const language = this._getLanguage();
+		let label = "want";
+		if (language === "pl") label = "pragnienie";
+		else if (language === "it") label = "desiderio";
+		
 		this._dataMessages.set("want", {
 			role: "system",
-			content: `The "want" of ${this._name} is: \`\`\`${want}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${want}\`\`\`.`,
 		});
 	}
 
@@ -437,9 +499,14 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	set opposition(opposition: string) {
+		const language = this._getLanguage();
+		let label = "opposition";
+		if (language === "pl") label = "przeciwność";
+		else if (language === "it") label = "opposizione";
+		
 		this._dataMessages.set("opposition", {
 			role: "system",
-			content: `The "opposition" of ${this._name} is: \`\`\`${opposition}\`\`\`.`,
+			content: `The "${label}" of ${this._name} is: \`\`\`${opposition}\`\`\`.`,
 		});
 	}
 
