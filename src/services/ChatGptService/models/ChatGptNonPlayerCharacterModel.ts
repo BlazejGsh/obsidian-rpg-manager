@@ -132,7 +132,7 @@ export class ChatGptNonPlayerCharacterModel {
 	context(): string {
 		const language = this._getLanguage();
 		if (language === "pl") {
-			return `Postać niezgrana, którą tworzysz, to ${this._name}. `;
+			return `Bohater niezależny, którego tworzysz, to ${this._name}. `;
 		}
 		if (language === "it") {
 			return `Il personaggio non giocante che stai creando è ${this._name}. `;
