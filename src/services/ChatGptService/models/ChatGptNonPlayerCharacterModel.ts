@@ -1,4 +1,5 @@
 import { RpgManagerInterface } from "src/RpgManagerInterface";
+import i18n from "i18next";
 import { ArcType } from "src/data/enums/ArcType";
 import { ElementInterface } from "src/data/interfaces/ElementInterface";
 import { ChatGptMessage } from "../ChatGptMessage";
@@ -15,9 +16,15 @@ export class ChatGptNonPlayerCharacterModel {
 		private _api: RpgManagerInterface,
 		private _campaign: ElementInterface,
 		private _name: string,
-		private _model: ChatGptModel = ChatGptModel.Gpt3Turbo
+		private _model?: ChatGptModel
 	) {
-		this._service = new ChatGptService(_api, _model);
+		// Use provided model or get from settings
+		const modelToUse = this._model || (this._api.settings.chatGptModel as ChatGptModel) || ChatGptModel.Gpt3Turbo;
+		this._service = new ChatGptService(_api, modelToUse);
+	}
+
+	private _getLanguage(): string {
+		return i18n.language || "en";
 	}
 
 	private _generateMessages(length: "short" | "long"): ChatGptMessageInterface[] {
@@ -76,6 +83,38 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	persona(): string {
+		const language = this._getLanguage();
+		
+		if (language === "pl") {
+			return `Masz szczególne doświadczenie w tworzeniu trójwymiarowych postaci. Aby utworzyć postać, używasz następujących atrybutów:
+- Łuk postaci (może być "Pozytywny", "Rozczarowania", "Upadku", "Korupcji" lub "Płaski")
+- Przekonania (Jakie są podstawowe przekonania postaci?)
+- Duchowe wspomnienie (przeszłe zdarzenie, które definiuje przekonanie postaci i kłamstwo, w które postać wierzy)
+- Kłamstwo (Coś, co postać przyjmuje za prawdę i sprawia, że podążają za swoim pragnieniem zamiast swoją potrzebą (tylko jeśli Typ Łuku Postaci to Pozytywny, Rozczarowania lub Upadek)
+- Potrzeba (Jaka jest rzeczywista potrzeba postaci?)
+- Mocne strony (wybrane z listy: Adaptacyjny, Ambitny, Asertywny, Charyzmatyczny, Współczujący, Odważny, Kreatywny, Stanowczy, Pracowity, Zdyscyplinowany, Energiczny, Empatyczny, Skromny, Inspirujący, Intuicyjny, Lojalny, Cierpliwy, Odporny, Pewny siebie, Strategiczny, Wytrwały, Dalekowzroczny, Dowcipny)
+- Słabe strony (wybrane z listy: Impulsywny, Niezdecydowany, Nieelastyczny, Niepewny, Nietolerancyjny, Nieodpowiedzialny, Leniwy, Naiwny, Zaniedbujący, Nerwowy, Uparty, Despotyczny, Przesadnie krytyczny, Perfekcjonista, Pesymista, Prokrastynator, Reaktywny, Sztywny, Egocentryczny, Wrażliwy, Nieśmiały, Upór, Nieśmiały, Bez skupienia, Niejasny)
+- Zachowanie (Jakie jest ogólne zachowanie postaci?)
+- Pragnienie (Czego postać uważa, że chce?)
+- Przeciwność (Jakie siły stoją w drodze postaci do osiągnięcia tego, czego chce?)
+`;
+		}
+		
+		if (language === "it") {
+			return `Sei particolarmente esperto nella creazione di personaggi tridimensionali. Per creare un personaggio utilizzi i seguenti attributi:
+- Arco del carattere (può essere "Positivo", "Disillusione", "Caduta", "Corruzione" o "Piatto")
+- Convinzioni (Quali sono le convinzioni fondamentali del personaggio?)
+- Fantasma (un evento passato che definisce la convinzione di un personaggio e una bugia che il personaggio crede sia vera)
+- Bugia (Qualcosa che il personaggio accetta come verità e lo fa seguire il suo desiderio invece del suo bisogno (solo se il Tipo di Arco del Carattere è Positivo, Disillusione o Caduta)
+- Bisogno (Qual è il vero bisogno del personaggio?)
+- Punti di forza (scelti da questo elenco: Adattabile, Ambizioso, Assertivo, Carismatico, Compassionevole, Coraggioso, Creativo, Decisivo, Diligente, Disciplinato, Energico, Empatico, Umile, Ispiratore, Intuitivo, Leale, Paziente, Resiliente, Sicuro di sé, Strategico, Tenace, Visionario, Arguto)
+- Debolezze (scelte da questo elenco: Impulsivo, Indeciso, Inflessibile, Insicuro, Intollerante, Irresponsabile, Pigro, Ingenuo, Negligente, Nervoso, Ostinato, Prepotente, Ipercritico, Perfezionista, Pessimista, Procrastinatore, Reattivo, Rigido, Egocentrico, Sensibile, Timido, Testardo, Timoroso, Senza focus, Vago)
+- Comportamento (Qual è il comportamento generale del personaggio?)
+- Desiderio (Cosa pensa il personaggio di volere?)
+- Opposizione (Quali forze si oppongono al personaggio nel raggiungimento di ciò che vuole?)
+`;
+		}
+		
 		return `You are particularly experienced in creating three dimensional characters. To create a character you use the following attributes:
 - Character Arc (it can be "Positive", "Disillusionment", "Fall", "Corruption" or "Flat")
 - Beliefs (What are the character's core beliefs?)
@@ -91,6 +130,13 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	context(): string {
+		const language = this._getLanguage();
+		if (language === "pl") {
+			return `Postać niezgrana, którą tworzysz, to ${this._name}. `;
+		}
+		if (language === "it") {
+			return `Il personaggio non giocante che stai creando è ${this._name}. `;
+		}
 		return `The non-player character you are creating is ${this._name}. `;
 	}
 
@@ -116,12 +162,18 @@ export class ChatGptNonPlayerCharacterModel {
 	}
 
 	async getBeliefs(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 podstawowych przekonań dla ${this._name}, które są spójne z opisem postaci i łukiem.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 convinzioni fondamentali per ${this._name} coerenti con la descrizione e l'arco del personaggio.`;
+		} else {
+			content = `Based on the information provided, suggest 10 core beliefs for ${this._name} that are consistent with the character description and arc.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 10 core beliefs for ${this._name} that are consistent with the character description and arc.
-The core beliefs are the beliefs that define the character. They are the core of the character's personality.
-The beliefs should not just circle around the specific information provided so far, but should be more general and applicable to multiple situations.
-Imagine the character as a real person and think about what they would believe in, what would be their core values and what would they fight for.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "long");
@@ -135,11 +187,18 @@ Imagine the character as a real person and think about what they would believe i
 	}
 
 	async getGhost(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 "duchowych wspomnień" dla ${this._name} spójnych z opisem i łukiem postaci.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 "fantasmi" per ${this._name} coerenti con la descrizione e l'arco del personaggio.`;
+		} else {
+			content = `Based on the information provided, suggest 10 "ghosts" for ${this._name} that are consistent with the character description and arc.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 10 "ghosts" for ${this._name} 
-that are consistent with the character description and arc.
-A Ghost is a challenging event in ${this._name}'s past that created a crack between the reality and the lie the character believes to be true.`,
+			content: content,
 
 			// content: `Based on the information provided, suggest 10 "ghosts" for ${this._name} that are consistent with the character description and arc.
 			// A ghost is a past event that defines the belief of a character.`,
@@ -156,10 +215,18 @@ A Ghost is a challenging event in ${this._name}'s past that created a crack betw
 	}
 
 	async getLie(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 "kłamstw" dla ${this._name}, które są spójne z dotychczasowo opisaną postacią.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 "bugie" per ${this._name} coerenti con il personaggio descritto finora.`;
+		} else {
+			content = `Based on the information provided, suggest 10 "lies" for ${this._name} that are consistent with the character described so far.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 10 "lies" for ${this._name} that are consistent with the character described so far.
-A lie is something the character accepts as the truth and make them follow their want instead of their need.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "long");
@@ -173,11 +240,18 @@ A lie is something the character accepts as the truth and make them follow their
 	}
 
 	async getNeed(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 "potrzeb" dla ${this._name} z silnym związkiem do dostarczonego "kłamstwa".`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 "bisogni" per ${this._name} con un forte legame alla "bugia" fornita.`;
+		} else {
+			content = `Based on the information provided, suggest 10 "needs" for ${this._name} with a strong link to the "lie" provided.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 10 "needs" for ${this._name} with a strong link to the "lie" provided.
-The "needs" must are consistent with the character described so far.
-A need is what the character really needs to grow and change, even if they don't realise it. They know their want, but they don't know their need.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "long");
@@ -191,11 +265,18 @@ A need is what the character really needs to grow and change, even if they don't
 	}
 
 	async getStrenghts(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 5 "mocnych stron" dla ${this._name} spójnych z dotychczasowo opisaną postacią. Tylko Polska lista: Adaptacyjny, Ambitny, Asertywny, Charyzmatyczny, Współczujący, Odważny, Kreatywny, Stanowczy, Pracowity, Zdyscyplinowany, Energiczny, Empatyczny, Skromny, Inspirujący, Intuicyjny, Lojalny, Cierpliwy, Odporny, Pewny siebie, Strategiczny, Wytrwały, Dalekowzroczny, Dowcipny. Jedno na linię.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 5 "punti di forza" per ${this._name} coerenti con il personaggio descritto finora. Solo elenco italiano: Adattabile, Ambizioso, Assertivo, Carismatico, Compassionevole, Coraggioso, Creativo, Decisivo, Diligente, Disciplinato, Energico, Empatico, Umile, Ispiratore, Intuitivo, Leale, Paziente, Resiliente, Sicuro di sé, Strategico, Tenace, Visionario, Arguto. Uno per riga.`;
+		} else {
+			content = `Based on the information provided, suggest 5 "strengths" for ${this._name} that are consistent with the character described so far. Only English list. Write ONE strength per line.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 5 "strengths" for ${this._name} that are consistent with the character described so far.
-A strength is a positive trait of the character. Your responses should ONLY contain strengths from this list: Adaptable, Ambitious, Assertive, Charismatic, Compassionate, Courageous, Creative, Decisive, Diligent, Disciplined, Energetic, Empathetic, Humble, Inspirational, Intuitive, Loyal, Patient, Resilient, Self-confident, Strategic, Tenacious, Visionary, Witty.
-Write ONE strength per line, using exclusively the words from the list without any additional characters.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "short");
@@ -209,11 +290,18 @@ Write ONE strength per line, using exclusively the words from the list without a
 	}
 
 	async getWeaknesses(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 5 "słabych stron" dla ${this._name} spójnych z dotychczasowo opisaną postacią. Tylko Polska lista: Impulsywny, Niezdecydowany, Nieelastyczny, Niepewny, Nietolerancyjny, Nieodpowiedzialny, Leniwy, Naiwny, Zaniedbujący, Nerwowy, Uparty, Despotyczny, Przesadnie krytyczny, Perfekcjonista, Pesymista, Prokrastynator, Reaktywny, Sztywny, Egocentryczny, Wrażliwy, Nieśmiały, Upór, Bez skupienia, Niejasny. Jedno na linię.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 5 "debolezze" per ${this._name} coerenti con il personaggio descritto finora. Solo elenco italiano: Impulsivo, Indeciso, Inflessibile, Insicuro, Intollerante, Irresponsabile, Pigro, Ingenuo, Negligente, Nervoso, Ostinato, Prepotente, Ipercritico, Perfezionista, Pessimista, Procrastinatore, Reattivo, Rigido, Egocentrico, Sensibile, Timido, Testardo, Timoroso, Senza focus, Vago. Uno per riga.`;
+		} else {
+			content = `Based on the information provided, suggest 5 "weaknesses" for ${this._name} that are consistent with the character described so far. Only English list. Write ONE weakness per line.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 5 "weaknesses" for ${this._name} that are consistent with the character described so far.
-A weakness is a negative trait of the character. Your responses should ONLY contain weaknesses from this list: Impulsive, Indecisive, Inflexible, Insecure, Intolerant, Irresponsible, Lazy, Naive, Neglectful, Nervous, Obstinate, Overbearing, Overcritical, Perfectionist, Pessimistic, Procrastinator, Reactive, Rigid, Self-centered, Sensitive, Shy, Stubborn, Timid, Unfocused, Vague.
-Write ONE weakness per line, using exclusively the words from the list without any additional characters.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "short");
@@ -278,10 +366,18 @@ Write ONE weakness per line, using exclusively the words from the list without a
 	}
 
 	async getWant(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 "pragnień" dla ${this._name} spójnych z dotychczasowo opisaną postacią.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 "desideri" per ${this._name} coerenti con il personaggio descritto finora.`;
+		} else {
+			content = `Based on the information provided, suggest 10 "wants" for ${this._name} that are consistent with the character described so far.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 10 "wants" for ${this._name} that are consistent with the character described so far.
-A want is what the character wants to achieve. They know their want, but they don't know their need.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "long");
@@ -295,10 +391,18 @@ A want is what the character wants to achieve. They know their want, but they do
 	}
 
 	async getOpposition(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 10 "przeciwności" dla ${this._name} spójnych z dotychczasowo opisaną postacią.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci 10 "opposizioni" per ${this._name} coerenti con il personaggio descritto finora.`;
+		} else {
+			content = `Based on the information provided, suggest 10 "oppositions" for ${this._name} that are consistent with the character described so far.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest 10 "oppositions" for ${this._name} that are consistent with the character described so far.
-An opposition is an obstacle that prevents the character from achieving their want. Your responses should provide hints about possible scenarios that could be used to create a story.`,
+			content: content,
 		};
 
 		return this._generateSuggestions(message, "long");
@@ -312,16 +416,19 @@ An opposition is an obstacle that prevents the character from achieving their wa
 	}
 
 	async getSensoryImprint(): Promise<string[]> {
+		const language = this._getLanguage();
+		let content = "";
+		if (language === "pl") {
+			content = `Na podstawie podanych informacji zasugeruj 5 "wrażeń zmysłowych" dla ${this._name} spójnych z opisaną postacią. Kolejność: wzrok, słuch, zapach, dotyk, smak.`;
+		} else if (language === "it") {
+			content = `In base alle informazioni fornite, suggerisci le 5 "impronte sensoriali" per ${this._name} coerenti con il personaggio descritto. Ordine: vista, suono, odore, tatto, gusto.`;
+		} else {
+			content = `Based on the information provided, suggest the 5 "sensory imprints" for ${this._name} that are consistent with the character described so far. Order: sight, sound, smell, touch, taste.`;
+		}
 		const message: ChatGptMessageInterface = {
 			role: "user",
-			content: `Based on the information provided, suggest the 5 "sensory imprints" for ${this._name} 
-that are consistent with the character described so far.
-A "Sensory Imprint" is a description of the immediately perceptible characteristincs of ${this._name}.
-Each "sensory imprint" (sight, sound, smell, touch, taste) should be a list of 3-5 bullet points of straightforward, short perceptible characteristincs.
-Reply with the sensory imprints in the following order: sight, sound, smell, touch, taste.`,
-		};
-
-		const response = await this._generateSuggestions(message, "short");
+			content: content,
+		};		const response = await this._generateSuggestions(message, "short");
 
 		const result: string[] = [];
 		let temp: string[] = [];

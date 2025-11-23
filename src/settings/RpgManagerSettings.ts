@@ -1,9 +1,11 @@
 import { AttributeInterface } from "@/data/interfaces/AttributeInterface";
+import { ChatGptModel } from "@/services/ChatGptService/enums/ChatGptModel";
 import { App, Plugin, PluginSettingTab, Setting, TAbstractFile, TFolder } from "obsidian";
 import { RpgManagerInterface } from "src/RpgManagerInterface";
 
 export interface RpgManagerSettingsInterface {
 	chatGptKey: string | undefined;
+	chatGptModel: string;
 	templatesFolder: string | undefined;
 	assetsFolder: string | undefined;
 	automaticMove: boolean;
@@ -17,6 +19,7 @@ export type PartialSettings = Partial<RpgManagerSettingsInterface>;
 
 export const rpgManagerDefaultSettings: RpgManagerSettingsInterface = {
 	chatGptKey: undefined,
+	chatGptModel: "gpt-4-turbo",
 	templatesFolder: undefined,
 	assetsFolder: undefined,
 	automaticMove: false,
@@ -150,6 +153,18 @@ export class RpgManagerSettings extends PluginSettingTab {
 						await this.saveSettings({ chatGptKey: value });
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("AI Model")
+			.setDesc("Select the AI model to use for character and chapter generation. GPT-4 produces better results but costs more.")
+			.addDropdown((dropdown) => {
+				dropdown.addOption(ChatGptModel.Gpt3Turbo, "GPT-3.5 Turbo (Faster, cheaper)")
+				dropdown.addOption(ChatGptModel.Gpt4, "GPT-4 Turbo (Better quality)")
+				dropdown.setValue(this._plugin.settings.chatGptModel)
+				dropdown.onChange(async (value: string) => {
+					await this.saveSettings({ chatGptModel: value });
+				});
+			});
 	}
 
 	private _createFolderMap(parent: TFolder | undefined = undefined, indent = 0): void {
