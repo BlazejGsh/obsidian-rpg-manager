@@ -57,7 +57,7 @@ export class RpgManagerCodeblockService {
 			EditorPositionService.setEditorPosition(this._file.path, editor, cursorPosition, scrollInfo);
 		}
 
-		this._app.vault.modify(this._file, content);
+		await this._app.vault.modify(this._file, content);
 	}
 
 	async update(values: any): Promise<void> {
@@ -130,7 +130,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async updateRelationshipInContent(relationships: RelationshipInterface[]): Promise<void> {
@@ -174,7 +174,7 @@ export class RpgManagerCodeblockService {
 			this._fileContent = this._fileContent.replace(toRemove, toAdd);
 		}
 
-		if (fileContent !== this._fileContent) this._modifyFileContent(this._fileContent);
+		if (fileContent !== this._fileContent) await this._modifyFileContent(this._fileContent);
 	}
 
 	async readCodeblock(): Promise<any | undefined> {
@@ -245,7 +245,7 @@ export class RpgManagerCodeblockService {
 			});
 		}
 
-		this._modifyFileContent(newContent.join("\n"));
+		await this._modifyFileContent(newContent.join("\n"));
 
 		return this._file;
 	}
@@ -260,7 +260,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async deleteAttributes(): Promise<void> {
@@ -272,7 +272,7 @@ export class RpgManagerCodeblockService {
 			const yamlService: YamlService = new YamlService();
 			const codeblockContent: string = yamlService.stringify(codeblock);
 
-			this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+			await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 		}
 	}
 
@@ -299,7 +299,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async updateRelationship(relationship: RelationshipInterface): Promise<void> {
@@ -327,7 +327,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async updateCodeblockDataList(attributes: any[]): Promise<void> {
@@ -347,7 +347,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async updateCodeblockSubData(names: string[], value: any | undefined): Promise<void> {
@@ -373,7 +373,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async updateCodeblockData(name: string, value: any | undefined): Promise<void> {
@@ -399,7 +399,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async updateRelationshipsPaths(toFile: TFile, oldPath: string): Promise<void> {
@@ -417,7 +417,7 @@ export class RpgManagerCodeblockService {
 
 		//content = content.replaceAll("[[" + oldPath + "|]]", "[[" + toFile.path + "|]]");
 
-		this._modifyFileContent(content);
+		await this._modifyFileContent(content);
 	}
 
 	async addImage(path: string, caption: string): Promise<void> {
@@ -452,7 +452,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async addOrUpdateTask(task: TaskInterface): Promise<void> {
@@ -469,7 +469,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async deleteTask(task: TaskInterface): Promise<void> {
@@ -484,7 +484,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async addRelationships(relationships: RelationshipInterface[]): Promise<void> {
@@ -507,7 +507,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async removeRelationship(element: ElementInterface, relatedElement: ElementInterface): Promise<void> {
@@ -525,7 +525,7 @@ export class RpgManagerCodeblockService {
 			(relationship: RelationshipInterface) => relationship.path !== element.file.path
 		);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async removeImage(path: string): Promise<void> {
@@ -537,7 +537,7 @@ export class RpgManagerCodeblockService {
 		const yamlService: YamlService = new YamlService();
 		const codeblockContent: string = yamlService.stringify(codeblock);
 
-		this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
+		await this._modifyFileContent(this._fileContent.replace(this._codeblockContent, codeblockContent));
 	}
 
 	async readInContentRelationships(): Promise<RelationshipInterface[]> {
